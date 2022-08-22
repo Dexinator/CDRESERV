@@ -1,8 +1,15 @@
 <?php
+/*
+$servername = "localhost";
+$username = "ucd4zyhryxc8w";
+$password = "968*d0aJ";
+$dbname = "dbscdmx58tuama";
+*/
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "test";
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
@@ -19,8 +26,19 @@ if(isset($_POST["submit"]) == "submit" && isset($_POST["eventTitle"]) != "")
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
   }
+  /*
+ `res_id` int(11) NOT NULL,
+ `res_suc`text   NOT NULL, 
+ `res_numpers` int(2) NOT  NULL, 
+ `res_catgames` text   NOT NULL, 
+ `res_asistencia` varchar(255),
+ `res_notes`text DEFAULT NULL, 
+ `res_eventTime` datetime,
+ `res_name` text NOT NULL, 
+ `res_telefono`
+*/
   //echo "Connected successfully";
-$sql = "SELECT res_name as title, res_date as start FROM reservations";
+$sql = "SELECT res_name as title, res_eventTime as start, res_suc, res_numpers,res_telefono,res_catgames,res_asistencia,res_notes  FROM reservations";
 $result = mysqli_query($conn,$sql); 
 $myArray = array();
 if ($result->num_rows > 0) {
@@ -63,9 +81,38 @@ bootstrap.min.css'>
         $("#successModal").modal("show");
         $("#eventDate").val(date.format());
       },
-      events: <?php echo json_encode($myArray); ?>
+      events: <?php echo json_encode($myArray); ?>,
+   eventRender: function(event, element) { 
+            element.find('.fc-title').append("<br/>" + event.res_suc); 
+            element.find('.fc-title').append("<br/>" + event.res_numpers + " personas");
+        },
+       
+   eventClick: function(calEvent, jsEvent, view) {
+
+    alert('Event: ' + calEvent.title + '\n' + 
+      'Sucursal: ' + calEvent.res_suc + '\n' +
+      'Juegos solicitados: ' + calEvent.res_catgames + '\n'+
+      'Requieren asistencia: ' + calEvent.res_asistencia + '\n'+
+      'Notas adicionales: ' + calEvent.res_notes + '\n'+
+      'Teléfono: ' + calEvent.res_telefono );
+
+    // change the border color just for fun
+    $(this).css('border-color', 'red');
+
+  }
     });
   });
+/*
+ `res_id` int(11) NOT NULL,
+ `res_suc`text   NOT NULL, 
+ `res_numpers` int(2) NOT  NULL, 
+ `res_catgames` text   NOT NULL, 
+ `res_asistencia` varchar(255),
+ `res_notes`text DEFAULT NULL, 
+ `res_eventTime` datetime,
+ `res_name` text NOT NULL, 
+ `res_telefono`
+*/
 </script>
 <style>
   body {

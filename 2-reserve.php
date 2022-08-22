@@ -22,20 +22,19 @@ class Reservation {
     $this->stmt = null;
   }
 
+
   // (C) SAVE RESERVATION
-  function save ($eventTime, $name, $email, $tel, $notes="") {
-    // (C1) CHECKS & RESTRICTIONS
-    // @TODO - ADD YOUR OWN RULES & REGULATIONS HERE
-    // MAX # OF RESERVATIONS ALLOWED?
-    // USER CAN ONLY BOOK X DAYS IN ADVANCE?
-    // USER CAN ONLY BOOK A MAX OF X SLOTS WITHIN Y DAYS?
+  function save ($sucursal, $numpers, $catgames, $asistencia, $notes,$eventTime2, $name,$telefono) {
+
+$corr_start=correct_times($eventTime2);
+
 
     // (C2) DATABASE ENTRY
     try {
       $this->stmt = $this->pdo->prepare(
-        "INSERT INTO `reservations` (`res_date`, `res_name`, `res_email`, `res_tel`, `res_notes`) VALUES (?,?,?,?,?)"
-      );
-      $this->stmt->execute([$eventTime, $name, $email, $tel, $notes]);
+        "INSERT INTO `reservations` (`res_suc`, `res_numpers`, `res_catgames`, `res_asistencia`, `res_notes`,  `res_eventTime`, `res_name`, `res_telefono`) VALUES (?,?,?,?,?,FROM_UNIXTIME(?),?,?)");
+      $this->stmt->execute([$sucursal, $numpers, $catgames, $asistencia, $notes,$corr_start, $name,$telefono]);
+     return true;
     } catch (Exception $ex) {
       $this->error = $ex->getMessage();
       return false;
@@ -44,10 +43,10 @@ class Reservation {
     // (C3) EMAIL
     // @TODO - REMOVE IF YOU WANT TO MANUALLY CALL TO CONFIRM OR SOMETHING
     // OR EMAIL THIS TO A MANAGER OR SOMETHING
-    $subject = "Reservation Received";
+    /*$subject = "Reservation Received";
     $message = "Thank you, we have received your request and will process it shortly.";
     @mail($email, $subject, $message);
-    return true;
+    return true;*/
   }
 
   // (D) GET RESERVATIONS FOR THE DAY
@@ -57,7 +56,7 @@ class Reservation {
 
     // (D2) GET ENTRIES
     $this->stmt = $this->pdo->prepare(
-      "SELECT * FROM `reservations` WHERE `res_date`=?"
+      "SELECT * FROM `reservations` WHERE `res_eventTime`=?"
     );
     $this->stmt->execute([$day]);
     return $this->stmt->fetchAll();
@@ -65,11 +64,25 @@ class Reservation {
 }
 
 // (E) DATABASE SETTINGS - CHANGE THESE TO YOUR OWN!
+/*define("DB_HOST", "localhost");
+define("DB_NAME", "test");
+define("DB_CHARSET", "utf8");
+define("DB_USER", "root");
+define("DB_PASSWORD", "");
+*/
+
+
+function correct_times($item) {
+  return $item/ 1000;
+}
+
 define("DB_HOST", "localhost");
 define("DB_NAME", "test");
 define("DB_CHARSET", "utf8");
 define("DB_USER", "root");
 define("DB_PASSWORD", "");
+
+
 
 // (F) NEW RESERVATION OBJECT
 $_RSV = new Reservation();
